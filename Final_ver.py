@@ -42,12 +42,12 @@ bullet_img = pygame.image.load('bullet.png')
 player_img = pygame.image.load('player.png')
 bomb_img = pygame.image.load('bomb.png')
 blood_img = pygame.image.load('blood.png')
-# 设置游戏窗口
+# 設置遊戲視窗
 window_width, window_height = 800, 600
 win = pygame.display.set_mode((window_width, window_height))
 pygame.display.set_caption("cocokill")
 
-# 定义颜色
+# 定義顏色
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
@@ -61,17 +61,17 @@ LIGHT_BLUE = (51, 153, 255)
 BROWN = (204, 102, 0)
 OBSTACLE_COLOR = [GREY1, GREY2, GREY3]
 
-# 设置角色参数
+# 設定角色參數
 player_size = 20
 player_speed = 5
 player_health = 500000  # 玩家生命值
 
-# 设置子弹参数
+# 設定子彈參數
 bullet_size = 5
 bullet_speed = 25
 bullets = []
 
-# 设置敌人参数
+# 設定敵人參數
 enemy_size = 25
 enemy_speed = 5
 enemy_health = 5
@@ -80,24 +80,24 @@ enemies = []
 enemy_bullets = []
 enemy_bullet_speed = 5
 
-#設置原子彈
+# 設定原子彈參數
 bomb_size = 40
 bomb_health = 40
 bombs = []
 
-#設置血
+# blood setup
 bloods = []
 
-# 设置地图参数
+# 設定地圖參數
 tile_size = 25
 map_width, map_height = 150, 150  # 地图尺寸（比窗口更大）
 map_pixel_width, map_pixel_height = map_width * tile_size, map_height * tile_size
 
-# 初始化玩家位置在地图中央
+# 初始化玩家位置在地圖中央
 player_x, player_y = map_pixel_width // 2, map_pixel_height // 2
 
 
-# 生成一条弯曲的走廊
+# 生成一條彎曲的走廊
 def generate_corridor_map():
     game_map = [[1 for _ in range(map_width)] for _ in range(map_height)]
     x, y = map_width // 2, map_height // 2
@@ -119,7 +119,7 @@ def generate_corridor_map():
             game_map[y][x + 1] = 0
             game_map[y - 1][x] = 0
             game_map[y + 1][x] = 0
-    # 在地图边缘添加一圈障碍物
+    # 地圖邊緣視角問題debug
     for i in range(map_width):
         for j in range(0, 20):
             game_map[j][i] = 1
@@ -136,7 +136,7 @@ def generate_corridor_map():
 game_map = generate_corridor_map()
 
 
-# 检查角色是否与障碍物碰撞
+# 碰撞情況
 def is_collision(new_x, new_y):
     tile_x = int(new_x) // tile_size
     tile_y = int(new_y) // tile_size
@@ -145,7 +145,7 @@ def is_collision(new_x, new_y):
     return False
 
 
-# 在地图中随机生成敌人
+# 再地圖中隨機生成敵人
 def generate_enemies():
     for _ in range(num_enemies):
         while True:
@@ -200,7 +200,7 @@ mode_menu = True
 mode = 0
 
 
-# 游戏循环
+
 run = True
 clock = pygame.time.Clock()
 enemy_move_tick = 0
@@ -241,7 +241,7 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # 发射子弹
+            # 發射子彈
             mouse_x, mouse_y = pygame.mouse.get_pos()
             direction_x = mouse_x + (player_x - window_width // 2)
             direction_y = mouse_y + (player_y - window_height // 2)
@@ -255,7 +255,7 @@ while run:
                 'dy': bullet_dy
             })
 
-    # 获取按键状态
+    # 獲取案件狀態
     keys = pygame.key.get_pressed()
 
     new_x, new_y = player_x, player_y
@@ -269,11 +269,11 @@ while run:
     if keys[pygame.K_s] and player_y < map_pixel_height - player_size:
         new_y += player_speed
 
-    # 检查新位置是否碰撞
+    # 檢查新位置是否碰撞
     if not is_collision(new_x, new_y):
         player_x, player_y = new_x, new_y
 
-    # 更新子弹位置
+    # 更新子彈位置
     new_bullets = []
     for bullet in bullets:
         bullet['x'] += bullet['dx']
@@ -285,7 +285,7 @@ while run:
 
     bullets = new_bullets
 
-    # 检测子弹与敌人的碰撞
+    # 檢查子彈有沒有射到人
     for bullet in bullets:
         for enemy in enemies:
             if (enemy['x'] - 3 < bullet['x'] < enemy['x'] + 3 + enemy_size and
@@ -315,11 +315,11 @@ while run:
                     bullets.remove(bullet)
                 break
 
-    # 更新敌人位置
+    # 更新敵人位置
     enemy_move_tick += 1
     enemy_shoot_tick += 1
 
-    if enemy_move_tick > 1:  # 敌人每秒钟随机移动一次
+    if enemy_move_tick > 1:  # 敵人移動
         for enemy in enemies:
             direction = random.choice(['up', 'down', 'left', 'right'])
             if direction == 'up' and enemy['y'] > 0 and not is_collision(enemy['x'], enemy['y'] - enemy_speed):
@@ -335,7 +335,7 @@ while run:
                 enemy['x'] += enemy_speed
         enemy_move_tick = 0
 
-    if enemy_shoot_tick > 60:  # 敌人每两秒钟射击一次
+    if enemy_shoot_tick > 60:  # 敵人射擊
         for enemy in enemies:
             angle = math.atan2(player_y - enemy['y'], player_x - enemy['x'])
             bullet_dx = enemy_bullet_speed * math.cos(angle)
@@ -348,7 +348,7 @@ while run:
             })
         enemy_shoot_tick = 0
 
-    # 更新敌人子弹位置
+    # 更新敵人子彈位置
     new_enemy_bullets = []
     for bullet in enemy_bullets:
         bullet['x'] += bullet['dx']
@@ -358,7 +358,7 @@ while run:
             if not is_collision(bullet['x'], bullet['y']):
                 new_enemy_bullets.append(bullet)
     enemy_bullets = new_enemy_bullets
-    # 检测子弹与玩家的碰撞
+    # 子彈有沒有射到人
     for bullet in enemy_bullets:
         if (player_x < bullet['x'] < player_x + player_size and
                 player_y < bullet['y'] < player_y + player_size):
@@ -367,15 +367,15 @@ while run:
                 run = False  # 游戏结束
             enemy_bullets.remove(bullet)
 
-    # 计算视窗的左上角位置，使视角跟随玩家
+    # 計算視角左上方位置
     offset_x = player_x - window_width // 2
     offset_y = player_y - window_height // 2
 
-    # 确保视角不超出地图边界
+    # 確保視角不會超出邊界
     offset_x = max(0, min(offset_x, map_pixel_width - window_width))
     offset_y = max(0, min(offset_y, map_pixel_height - window_height))
 
-    # 绘制地图
+    # 繪製地圖
     win.fill(WHITE)
     for row in range(map_height):
         for col in range(map_width):
@@ -388,18 +388,18 @@ while run:
 
         win.blit(blood_img,(blood['x'] - offset_x, blood['y'] - offset_y))
 
-    # 绘制角色
+    # 繪製角色
     win.blit(player_img, (player_x - offset_x, player_y - offset_y))
 
-    # 绘制子弹
+    # 繪製子弹
     for bullet in bullets:
         # pygame.draw.rect(win, BLUE, (bullet['x'] - offset_x, bullet['y'] - offset_y, bullet_size, bullet_size))
         win.blit(bullet_img, (bullet['x'] - offset_x, bullet['y'] - offset_y))
-    # 绘制敌人
+    # 繪製敌人
     for enemy in enemies:
         win.blit(img, (enemy['x'] - offset_x , enemy['y'] - offset_y))
 
-    # 绘制敌人的子弹
+    # 繪製敌人的子弹
     for bullet in enemy_bullets:
         pygame.draw.rect(win, BLACK, (bullet['x'] - offset_x, bullet['y'] - offset_y, bullet_size, bullet_size))
 
@@ -408,7 +408,7 @@ while run:
 
 
 
-    # 绘制玩家生命值
+    # 繪製玩家生命值
     font = pygame.font.SysFont(None, 24)
     health_text = font.render(f'Health: {player_health}', True, BLACK)
     enemy_killed_text = font.render(f'Enemy_killed: {enemy_killed}', True, BLACK)

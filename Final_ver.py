@@ -75,7 +75,7 @@ bullets = []
 enemy_size = 25
 enemy_speed = 5
 enemy_health = 5
-num_enemies = 20
+num_enemies = 15
 enemies = []
 enemy_bullets = []
 enemy_bullet_speed = 5
@@ -415,10 +415,11 @@ while run:
     win.blit(health_text, (10, 10))
     win.blit(enemy_killed_text, (10, 40))
     if mode == 3:
-        if p % 10 == 0:
+        num_enemies = 20
+        if p % 200 == 0:
             generate_enemies()
     else:
-        if p % 500 == 0:
+        if p % 2000 == 0:
             generate_enemies()
     p += 1
     if p > 10000:

@@ -64,7 +64,7 @@ OBSTACLE_COLOR = [GREY1, GREY2, GREY3]
 # 設定角色參數
 player_size = 20
 player_speed = 5
-player_health = 500000  # 玩家生命值
+player_health = 500  # 玩家生命值
 
 # 設定子彈參數
 bullet_size = 5

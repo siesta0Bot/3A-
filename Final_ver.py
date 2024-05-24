@@ -42,7 +42,9 @@ bullet_img = pygame.image.load('bullet.png')
 player_img = pygame.image.load('player.png')
 bomb_img = pygame.image.load('bomb.png')
 blood_img = pygame.image.load('blood.png')
-
+life_img = pygame.image.load('life.png')
+thunder_img = pygame.image.load('thunder.png')
+sword_img = pygame.image.load('sword.png')
 window_width, window_height = 800, 600
 win = pygame.display.set_mode((window_width, window_height))
 pygame.display.set_caption("cocokill")
@@ -65,7 +67,7 @@ OBSTACLE_COLOR = [GREY1, GREY2, GREY3]
 player_size = 20
 player_speed = 5
 player_health = 500  
-
+player_attack = 1
 
 bullet_size = 5
 bullet_speed = 25
@@ -88,7 +90,17 @@ bombs = []
 
 bloods = []
 
+life_size = 20
+num_life = 3
+lifes = []
 
+thunder_size = 20
+num_thunder = 3
+thunders = []
+
+sword_size = 20
+num_sword = 3
+swords = []
 tile_size = 25
 map_width, map_height = 150, 150  
 map_pixel_width, map_pixel_height = map_width * tile_size, map_height * tile_size
@@ -164,9 +176,33 @@ def generate_bomb():
             bombs.append({'x': bomb_x, 'y': bomb_y, 'health': bomb_health})
             break
 
+def generate_life():
+    for _ in range(num_life):
+        while True:
+            life_x = random.randint(0, map_pixel_width - life_size)
+            life_y = random.randint(0, map_pixel_height - life_size)
+            if not is_collision(life_x, life_y) and not is_collision(life_x + 5, life_y) and not is_collision(life_x, life_y + 5) and not is_collision(life_x + 5, life_y + 5):
+                lifes.append({'x': life_x, 'y': life_y})
+                break
+
+def generate_thunder():
+    for _ in range(num_thunder):
+        while True:
+            thunder_x = random.randint(0, map_pixel_width - thunder_size)
+            thunder_y = random.randint(0, map_pixel_height - thunder_size)
+            if not is_collision(thunder_x, thunder_y) and not is_collision(thunder_x + 5, thunder_y) and not is_collision(thunder_x, thunder_y + 5) and not is_collision(thunder_x + 5, thunder_y + 5):
+                thunders.append({'x': thunder_x, 'y': thunder_y})
+                break
+def generate_sword():
+    for _ in range(num_sword):
+        while True:
+            sword_x = random.randint(0, map_pixel_width - sword_size)
+            sword_y = random.randint(0, map_pixel_height - sword_size)
+            if not is_collision(sword_x, sword_y) and not is_collision(sword_x + 5, sword_y) and not is_collision(sword_x, sword_y + 5) and not is_collision(sword_x + 5, sword_y + 5):
+                swords.append({'x': sword_x, 'y': sword_y})
+                break
 generate_enemies()
 generate_bomb()
-
 
 class Button:
     def __init__(self, x, y, image):
@@ -235,8 +271,11 @@ while run:
     img = pygame.transform.rotate(img, 50 + p * 4)
     bullet_img = pygame.transform.scale(bullet_img, (20, 20))
     bomb_img = pygame.transform.scale(bomb_img, (40, 40))
-    player_img = pygame.transform.scale(player_img, (20, 20))
+    player_img = pygame.transform.scale(player_img, (30, 30))
     blood_img = pygame.transform.scale(blood_img, (40, 40))
+    life_img = pygame.transform.scale(life_img, (20, 20))
+    thunder_img = pygame.transform.scale(thunder_img, (20, 20))
+    sword_img = pygame.transform.scale(sword_img, (20, 20))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -290,7 +329,7 @@ while run:
         for enemy in enemies:
             if (enemy['x'] - 3 < bullet['x'] < enemy['x'] + 3 + enemy_size and
                     enemy['y'] - 3 < bullet['y'] < enemy['y'] + 3 + enemy_size):
-                enemy['health'] -= 1
+                enemy['health'] -= player_attack
                 if enemy['health'] <= 0:
                     bloods.append({'x':enemy['x'],'y':enemy['y']})
                     enemies.remove(enemy)
@@ -315,7 +354,31 @@ while run:
                     bullets.remove(bullet)
                 break
 
-    
+    for life in lifes:
+        if (life['x'] < player_x + player_size < life['x'] + life_size and
+                life['y'] < player_y + player_size < life['y'] + life_size):
+            player_health += 5
+            lifes.remove(life)
+    for thunder in thunders:
+        if (thunder['x'] < player_x + player_size < thunder['x'] + thunder_size and
+                thunder['y'] < player_y + player_size < thunder['y'] + thunder_size):
+            player_speed += 0.25
+            thunders.remove(thunder)
+
+    for sword in swords:
+        if (sword['x'] < player_x + player_size < sword['x'] + sword_size and
+                sword['y'] < player_y + player_size < sword['y'] + sword_size):
+            player_attack += 0.1
+            swords.remove(sword)
+
+    if len(lifes) <= 0:
+        generate_life()
+
+    if len(thunders) <= 0:
+        generate_thunder()
+
+    if len(swords) <= 0:
+        generate_sword()
     enemy_move_tick += 1
     enemy_shoot_tick += 1
 
@@ -406,8 +469,14 @@ while run:
     for bomb in bombs:
         win.blit(bomb_img, (bomb['x'] - offset_x, bomb['y'] - offset_y))
 
+    for life in lifes:
+        win.blit(life_img, (life['x'] - offset_x, life['y'] - offset_y))
 
+    for thunder in thunders:
+        win.blit(thunder_img, (thunder['x'] - offset_x, thunder['y'] - offset_y))
 
+    for sword in swords:
+        win.blit(sword_img, (sword['x'] - offset_x , sword['y'] - offset_y))
     
     font = pygame.font.SysFont(None, 24)
     health_text = font.render(f'Health: {player_health}', True, BLACK)

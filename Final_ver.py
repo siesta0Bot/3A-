@@ -347,7 +347,7 @@ while run:
                         bloods.append({'x': enemy['x'], 'y': enemy['y']})
                     enemies.clear()
                     bombs.clear()
-                    bloods.clear()
+                    #bloods.clear()
                     enemy_bullets.clear()
                     generate_bomb()
                 if bullet in bullets:
